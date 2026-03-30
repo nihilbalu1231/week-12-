@@ -33,8 +33,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo 'Running SonarQube analysis...'
-                withSonarQubeEnv('sonarqube') {   // must match Jenkins SonarQube server name
-                    sh 'sonar-scanner -Dsonar.projectKey=week12-project -Dsonar.sources=./src'
+                withSonarQubeEnv('sonarqube') {   // Jenkins SonarQube server name
+                    // Use the Jenkins-installed SonarScanner
+                    def scannerHome = tool name: 'sonarscanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=week12-project -Dsonar.sources=./src"
                 }
             }
         }
@@ -44,7 +46,7 @@ pipeline {
         // ----------------------
         stage('Quality Gate') {
             steps {
-                echo 'Checking Quality Gate status...'
+                echo 'Checking SonarQube Quality Gate status...'
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
