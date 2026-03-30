@@ -34,9 +34,11 @@ pipeline {
             steps {
                 echo 'Running SonarQube analysis...'
                 withSonarQubeEnv('sonarqube') {   // Jenkins SonarQube server name
-                    // Use the Jenkins-installed SonarScanner
-                    def scannerHome = tool name: 'sonarscanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=week12-project -Dsonar.sources=./src"
+                    script {
+                        // Use the Jenkins-installed SonarScanner
+                        def scannerHome = tool name: 'sonarscanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=week12-project -Dsonar.sources=./src"
+                    }
                 }
             }
         }
