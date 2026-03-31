@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         CI = 'true'
-        DOCKER_IMAGE = 'nihil/week12-project:latest'  // Docker image name
-        DOCKERHUB_USER = 'nihilag'                     // Your Docker Hub username
-        DOCKERHUB_TOKEN = credentials('dockerhub-token') // Your Docker Hub token in Jenkins
+        DOCKER_IMAGE = 'nihilag/week12-project:latest'   // Fixed username
+        DOCKERHUB_USER = 'nihilag'                       // Your Docker Hub username
+        DOCKERHUB_TOKEN = credentials('dockerhub-token') // Token stored in Jenkins
     }
 
     stages {
@@ -33,7 +33,11 @@ pipeline {
             steps {
                 echo 'Running SonarQube analysis...'
                 withSonarQubeEnv('sonarqube') {
-                    sh "/var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonarscanner/bin/sonar-scanner -Dsonar.projectKey=week12-project -Dsonar.sources=./src"
+                    sh """
+                    /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonarscanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=week12-project \
+                    -Dsonar.sources=./src
+                    """
                 }
             }
         }
@@ -62,13 +66,13 @@ pipeline {
     post {
         always {
             echo 'Pipeline finished.'
-            sh 'docker logout || true' // Optional cleanup
-        }
-        failure {
-            echo 'Pipeline failed.'
+            sh 'docker logout || true'
         }
         success {
             echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
